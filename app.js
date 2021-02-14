@@ -35,6 +35,7 @@ gl.attachShader(shaderProgram, fragShader);
 gl.linkProgram(shaderProgram);
 gl.useProgram(shaderProgram);
 
+// TODO: hapus isi ini jika tidak dipakai
 const objectToDraw = [
     {
         type: gl.TRIANGLE_FAN,
@@ -77,5 +78,59 @@ function render() {
         gl.drawArrays(object.type, 0, object.vertices.length);
     });
 }
+
+
+// live drawing
+
+let drawType;
+let drawing = false;
+let vertices = [];
+let colors = [];
+
+function getMousePos(canvas, evt) {
+    const rect = canvas.getBoundingClientRect(),
+        scaleX = canvas.width / rect.width,
+        scaleY = canvas.height / rect.height;
+
+    return {
+        x: (evt.clientX - rect.left) * scaleX,
+        y: (evt.clientY - rect.top) * scaleY
+    }
+}
+
+// canvas event listener
+canvas.addEventListener('mousedown', (e) => {
+    const mousePos = getMousePos(canvas, e);
+    const mouseCoord = {
+        x: -1 + 2 * mousePos.x / canvas.width,
+        y: -1 + 2 * (canvas.height - mousePos.y) / canvas.height
+    }
+
+    const colorInput = document.getElementById('color').value;
+    const color = {
+        r: parseInt("0x" + colorInput.slice(1, 3)) / 256.0,
+        g: parseInt("0x" + colorInput.slice(3, 5)) / 256.0,
+        b: parseInt("0x" + colorInput.slice(5, 7)) / 256.0
+    }
+
+    vertices.push(mouseCoord.x, mouseCoord.y);
+    colors.push(color.r, color.g, color.b);
+
+    if (!drawing) {
+        drawType = document.getElementById('type').value;
+        drawing = true;
+    }
+    else {
+        if (drawType === 'line') {
+            objectToDraw.push({
+                type: gl.LINES, vertices, colors
+            });
+            vertices = [];
+            colors = [];
+            drawing = false;
+            render();
+        }
+    }
+});
 
 render();

@@ -10,6 +10,20 @@
 </head>
 
 <body>
+    <form>
+        <div>
+            <label for="type">Type: </label>
+            <select name="type" id="type">
+                <option value="line">Line</option>
+                <option value="square">Square</option>
+                <option value="polygon">Polygon</option>
+            </select>
+        </div>
+        <div>
+            <label for="color">Color: </label>
+            <input type="color" name="color" id="color">
+        </div>
+    </form>
     <canvas width="700" height="500" id="drawer-canvas"></canvas>
     <script src="app.js"></script>
 </body>
