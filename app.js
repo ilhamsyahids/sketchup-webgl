@@ -116,8 +116,15 @@ canvas.addEventListener('mousedown', (e) => {
                 parseInt("0x" + colorInput.slice(3, 5)) / 256.0,
                 parseInt("0x" + colorInput.slice(5, 7)) / 256.0);
 
+            let indices = [];
+            if (vertices.length < 6) { // only have side less than 3, so 2*3 vertices element
+                for (let vertex=0, i=0; vertex<vertices.length; vertex+=2, ++i){
+                    indices.push(i);
+                }
+            }
+
             objectToDraw.push({
-                type, vertices, color
+                type, vertices, color, indices
             });
 
             vertices = [];
@@ -125,6 +132,7 @@ canvas.addEventListener('mousedown', (e) => {
             drawing = false;
             render();
         }
+
         if (drawType === 'line') {
             doneDrawing(gl.LINES);
         }
