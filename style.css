@@ -3,6 +3,7 @@ body {
 }
 
 canvas {
+    border: 1px solid gray;
     cursor: crosshair;
     margin: 20px;
 }
