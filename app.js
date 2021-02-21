@@ -41,7 +41,9 @@ const objectToDraw = [];
 function render() {
     gl.clearColor(0.5, 0.5, 0.5, 0.9);
     gl.enable(gl.DEPTH_TEST);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // Glitch when drag object
+    // gl.clear(gl.COLOR_BUFFER_BIT);
 
     objectToDraw.forEach((object) => {
 
