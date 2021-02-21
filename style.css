@@ -1,7 +1,8 @@
-body{
+body {
     margin: 0;
 }
 
-canvas{
+canvas {
+    cursor: crosshair;
     margin: 20px;
 }
