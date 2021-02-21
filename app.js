@@ -1,4 +1,4 @@
-const canvas = document.getElementById('drawer-canvas');
+const canvas = document.getElementById('canvas');
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
 gl.viewport(0, 0, canvas.width, canvas.height);
@@ -35,15 +35,8 @@ gl.attachShader(shaderProgram, fragShader);
 gl.linkProgram(shaderProgram);
 gl.useProgram(shaderProgram);
 
-// TODO: hapus isi ini jika tidak dipakai
-const objectToDraw = [
-    {
-        type: gl.TRIANGLE_FAN,
-        vertices: [-0.5, 0.5, -0.5, 0.3, 0.0, 0.3, 0.0, 0.5],
-        indices: [0, 1, 2, 3],
-        color: [1, 0, 0]
-    }
-];
+// List of object in canvas
+const objectToDraw = [];
 
 function render() {
     gl.clearColor(0.5, 0.5, 0.5, 0.9);
@@ -78,75 +71,85 @@ function render() {
 // live drawing
 
 let drawType;
-let drawing = false;
-let mousePos = [];
+let dragging = false;
+let dragStartLocation;
+let lastIndex;
 
-function getMousePos(canvas, evt) {
-    const rect = canvas.getBoundingClientRect(),
-        scaleX = canvas.width / rect.width,
-        scaleY = canvas.height / rect.height;
+function getMousePos(event) {
+    const x = event.clientX - canvas.getBoundingClientRect().left;
+    const y = event.clientY - canvas.getBoundingClientRect().top;
 
-    return {
-        x: (evt.clientX - rect.left) * scaleX,
-        y: (evt.clientY - rect.top) * scaleY
+    return {x: x, y: y};
+}
+
+function draw(type, arrPos) {
+    let vertices = [];
+
+    arrPos.forEach((pos) => {
+        vertices.push(
+            -1 + 2 * pos.x / canvas.width, // x
+            -1 + 2 * (canvas.height - pos.y) / canvas.height // y
+        );
+    })
+
+    let indices = [];
+    for (let vertex = 0, i = 0; vertex < vertices.length; vertex += 2, ++i) {
+        indices.push(i);
+    }
+
+    const colorInput = document.getElementById('color').value;
+    let color = [];
+    color.push(
+        parseInt("0x" + colorInput.slice(1, 3)) / 256.0,
+        parseInt("0x" + colorInput.slice(3, 5)) / 256.0,
+        parseInt("0x" + colorInput.slice(5, 7)) / 256.0);
+
+    objectToDraw[lastIndex] = {
+        type, vertices, color, indices
+    };
+
+    render();
+}
+
+function drawShape(pos1, pos2) {
+    if (drawType === 'line') {
+        draw(gl.LINES, [pos1, pos2])
+    } else if (drawType === 'square') {
+        const min_x = Math.min(pos1.x, pos2.x), max_x = Math.max(pos1.x, pos2.x),
+            min_y = Math.min(pos1.y, pos2.y), max_y = Math.max(pos1.y, pos2.y);
+        const length = Math.min(max_x - min_x, max_y - min_y);
+        const pos = [
+            { x: min_x, y: max_y },                   // upper left
+            { x: min_x, y: max_y - length },          // bottom left
+            { x: min_x + length, y: max_y - length }, // bottom right
+            { x: min_x + length, y: max_y },          // upper right
+        ];
+        draw(gl.TRIANGLE_FAN, pos);
     }
 }
 
-// canvas event listener
-canvas.addEventListener('mousedown', (e) => {
-    mousePos.push(getMousePos(canvas, e));
+function dragStart(event) {
+    drawType = document.getElementById('type').value;
+    dragging = true;
+    dragStartLocation = getMousePos(event);
+    lastIndex = objectToDraw.length;
+}
 
-    if (!drawing) {
-        drawType = document.getElementById('type').value;
-        drawing = true;
+function drag(event) {
+    if (dragging === true) {
+        const currPos = getMousePos(event);
+        drawShape(dragStartLocation, currPos);
     }
-    else {
-        function doneDrawing(type) {
-            let vertices = [];
-            mousePos.forEach((pos) => {
-                vertices.push(
-                    -1 + 2 * pos.x / canvas.width, // x
-                    -1 + 2 * (canvas.height - pos.y) / canvas.height // y
-                );
-            })
+}
 
-            let indices = [];
-            for (let vertex = 0, i = 0; vertex < vertices.length; vertex += 2, ++i) {
-                indices.push(i);
-            }
+function dragStop(event) {
+    dragging = false;
+    const currPos = getMousePos(event);
+    drawShape(dragStartLocation, currPos);
+}
 
-            const colorInput = document.getElementById('color').value;
-            let color = [];
-            color.push(
-                parseInt("0x" + colorInput.slice(1, 3)) / 256.0,
-                parseInt("0x" + colorInput.slice(3, 5)) / 256.0,
-                parseInt("0x" + colorInput.slice(5, 7)) / 256.0);
-
-            objectToDraw.push({
-                type, vertices, color, indices
-            });
-
-            mousePos = [];
-            drawing = false;
-            render();
-        }
-
-        if (drawType === 'line') {
-            doneDrawing(gl.LINES);
-        }
-        else if (drawType === 'square') {
-            const min_x = Math.min(mousePos[0].x, mousePos[1].x), max_x = Math.max(mousePos[0].x, mousePos[1].x),
-                min_y = Math.min(mousePos[0].y, mousePos[1].y), max_y = Math.max(mousePos[0].y, mousePos[1].y);
-            const length = Math.min(max_x - min_x, max_y - min_y);
-            mousePos = [
-                { x: min_x, y: max_y },                   // upper left
-                { x: min_x, y: max_y - length },          // bottom left
-                { x: min_x + length, y: max_y - length }, // bottom right
-                { x: min_x + length, y: max_y },          // upper right
-            ];
-            doneDrawing(gl.TRIANGLE_FAN);
-        }
-    }
-});
+canvas.addEventListener('mousedown', dragStart, false);
+canvas.addEventListener('mousemove', drag, false);
+canvas.addEventListener('mouseup', dragStop, false);
 
 render();
