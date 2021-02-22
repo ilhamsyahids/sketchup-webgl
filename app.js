@@ -1,4 +1,7 @@
 const canvas = document.getElementById('canvas');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight - 5;
+
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
 gl.viewport(0, 0, canvas.width, canvas.height);
@@ -99,7 +102,7 @@ function draw(type, arrPos) {
         indices.push(i);
     }
 
-    const colorInput = document.getElementById('color').value;
+    const colorInput = getColor();
     let color = [];
     color.push(
         parseInt("0x" + colorInput.slice(1, 3)) / 256.0,
@@ -148,6 +151,10 @@ function dragStop(event) {
     dragging = false;
     const currPos = getMousePos(event);
     drawShape(dragStartLocation, currPos);
+}
+
+function getColor() {
+    return document.getElementById('color').value;
 }
 
 canvas.addEventListener('mousedown', dragStart, false);
