@@ -39,7 +39,7 @@ gl.linkProgram(shaderProgram);
 gl.useProgram(shaderProgram);
 
 // List of object in canvas
-const objectToDraw = [];
+let objectToDraw = [];
 
 function render() {
     gl.clearColor(0.5, 0.5, 0.5, 0.9);
@@ -156,6 +156,14 @@ function dragStop(event) {
 function getColor() {
     return document.getElementById('color').value;
 }
+
+function clearCanvas () {
+    objectToDraw = []
+    gl.clear(gl.DEPTH_BUFFER_BIT);
+}
+
+const clearButton = document.querySelector('.clear');
+clearButton.addEventListener('click', clearCanvas);
 
 canvas.addEventListener('mousedown', dragStart, false);
 canvas.addEventListener('mousemove', drag, false);
