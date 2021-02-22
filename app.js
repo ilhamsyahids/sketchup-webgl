@@ -165,8 +165,31 @@ function clearCanvas() {
     gl.clear(gl.DEPTH_BUFFER_BIT);
 }
 
-const clearButton = document.querySelector('.clear');
+function saveCanvas() {
+    const obj = {
+        object: objectToDraw,
+        canvas: { width: canvas.width, height: canvas.height }
+    }
+    downloadObject(obj, `${Date.now()}.json`)
+}
+
+function downloadObject(obj, filename) {
+    var blob = new Blob([JSON.stringify(obj)], { type: "application/json;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var elem = document.createElement("a");
+    elem.href = url;
+    elem.download = filename;
+    document.body.appendChild(elem);
+    elem.click();
+    document.body.removeChild(elem);
+}
+
+// Function button sidebar
+const clearButton = document.querySelector('#clear');
 clearButton.addEventListener('click', clearCanvas);
+
+const saveButton = document.querySelector('#save');
+saveButton.addEventListener('click', saveCanvas);
 
 canvas.addEventListener('mousedown', dragStart, false);
 canvas.addEventListener('mousemove', drag, false);

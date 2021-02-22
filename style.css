@@ -64,11 +64,11 @@ main .shape:hover .shape-picker {
     display: block
 }
 
-main .clear {
+main .btnSide {
     display: block;
     width: 30px;
     height: 30px;
-    margin: 0 auto;
+    margin: 15px auto;
     color: #171717;
     font-size: 20px;
     font-weight: 900;
