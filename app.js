@@ -88,7 +88,7 @@ function getMousePos(event) {
     const x = event.clientX - canvas.getBoundingClientRect().left;
     const y = event.clientY - canvas.getBoundingClientRect().top;
 
-    return {x: x, y: y};
+    return { x: x, y: y };
 }
 
 function draw(type, arrPos) {
@@ -124,14 +124,13 @@ function drawShape(pos1, pos2) {
     if (drawType === 'line') {
         draw(gl.LINES, [pos1, pos2])
     } else if (drawType === 'square') {
-        const min_x = Math.min(pos1.x, pos2.x), max_x = Math.max(pos1.x, pos2.x),
-            min_y = Math.min(pos1.y, pos2.y), max_y = Math.max(pos1.y, pos2.y);
-        const length = Math.min(max_x - min_x, max_y - min_y);
+        const length = Math.min(Math.abs(pos2.x - pos1.x), Math.abs(pos2.y - pos1.y));
+        const sign = { x: Math.sign(pos2.x - pos1.x), y: Math.sign(pos2.y - pos1.y) };
         const pos = [
-            { x: min_x, y: max_y },                   // upper left
-            { x: min_x, y: max_y - length },          // bottom left
-            { x: min_x + length, y: max_y - length }, // bottom right
-            { x: min_x + length, y: max_y },          // upper right
+            { x: pos1.x, y: pos1.y },
+            { x: pos1.x, y: pos1.y + sign.y * length },
+            { x: pos1.x + sign.x * length, y: pos1.y + sign.y * length },
+            { x: pos1.x + sign.x * length, y: pos1.y }
         ];
         draw(gl.TRIANGLE_FAN, pos);
     }
@@ -161,7 +160,7 @@ function getColor() {
     return document.getElementById('color').value;
 }
 
-function clearCanvas () {
+function clearCanvas() {
     objectToDraw = []
     gl.clear(gl.DEPTH_BUFFER_BIT);
 }
