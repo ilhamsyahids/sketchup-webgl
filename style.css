@@ -1,9 +1,82 @@
 body {
     margin: 0;
+    padding: 0;
+    background: #F3F3F3;
+}
+
+main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 50px;
+    background: #171717
+}
+
+main section {
+    display: block;
+    margin: 15px auto;
+    width: 30px;
+    height: 30px
+}
+
+main .colors .color-picker {
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
+    padding: 0;
+    border: 0;
+}
+
+main .shape {
+    position: relative;
+    background-color: #F3F3F3
+}
+
+main .shape::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 50%;
+    background: #171717
+}
+
+main .shape .shape-picker {
+    display: none;
+    position: absolute;
+    width: auto;
+    height: 25px;
+    left: 30px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%)
+}
+
+main .shape .shape-picker:focus {
+    display: block
+}
+
+main .shape:hover .shape-picker {
+    display: block
+}
+
+main .clear {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
+    color: #171717;
+    font-size: 20px;
+    font-weight: 900;
+    border: none;
+    outline: none;
+    cursor: pointer
 }
 
 canvas {
-    border: 1px solid gray;
     cursor: crosshair;
-    margin: 20px;
 }
