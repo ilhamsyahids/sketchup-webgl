@@ -174,7 +174,7 @@ function saveCanvas() {
 }
 
 function downloadObject(obj, filename) {
-    var blob = new Blob([JSON.stringify(obj)], { type: "application/json;charset=utf-8" });
+    var blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json;charset=utf-8" });
     var url = URL.createObjectURL(blob);
     var elem = document.createElement("a");
     elem.href = url;
@@ -184,12 +184,41 @@ function downloadObject(obj, filename) {
     document.body.removeChild(elem);
 }
 
+function loadCanvas(loader) {
+    loader.click()
+}
+
+const processFile = async (file) => {
+    const fr = new FileReader();
+
+    fr.readAsArrayBuffer(file);
+    const text = await file.text();
+    const loaded = JSON.parse(text);
+
+    clearCanvas();
+    objectToDraw = loaded.object;
+    render();
+}
+
 // Function button sidebar
 const clearButton = document.querySelector('#clear');
 clearButton.addEventListener('click', clearCanvas);
 
 const saveButton = document.querySelector('#save');
 saveButton.addEventListener('click', saveCanvas);
+
+const loadButton = document.querySelector('#load');
+const loaderButton = document.querySelector('#loader');
+
+loadButton.addEventListener('click', (e) => {
+    loadCanvas(loaderButton)
+});
+loaderButton.addEventListener('change', (e) => {
+    const file = loaderButton.files[0];
+    if (file) {
+      processFile(file);
+    }
+})
 
 canvas.addEventListener('mousedown', dragStart, false);
 canvas.addEventListener('mousemove', drag, false);
