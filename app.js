@@ -48,6 +48,8 @@ function render() {
     // Glitch when drag object
     // gl.clear(gl.COLOR_BUFFER_BIT);
 
+    objectToDraw.reverse()
+
     objectToDraw.forEach((object) => {
 
         const vertexBuffer = gl.createBuffer();
@@ -70,6 +72,8 @@ function render() {
 
         gl.drawElements(object.type, object.indices.length, gl.UNSIGNED_SHORT, 0);
     });
+
+    objectToDraw.reverse()
 }
 
 
