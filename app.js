@@ -80,7 +80,7 @@ function render() {
 // live drawing
 
 let drawType;
-let dragging = false;
+let dragging = false, clicked = false;
 let dragStartLocation;
 let lastIndex;
 
@@ -138,22 +138,26 @@ function drawShape(pos1, pos2) {
 
 function dragStart(event) {
     drawType = document.getElementById('type').value;
-    dragging = true;
+    clicked = true;
     dragStartLocation = getMousePos(event);
     lastIndex = objectToDraw.length;
 }
 
 function drag(event) {
-    if (dragging === true) {
+    if (clicked) {
+        dragging = true;
         const currPos = getMousePos(event);
         drawShape(dragStartLocation, currPos);
     }
 }
 
 function dragStop(event) {
-    dragging = false;
-    const currPos = getMousePos(event);
-    drawShape(dragStartLocation, currPos);
+    clicked = false;
+    if (dragging) {
+        const currPos = getMousePos(event);
+        drawShape(dragStartLocation, currPos);
+        dragging = false;
+    }
 }
 
 function getColor() {
