@@ -91,12 +91,14 @@ let drawType;
 let dragging = false, clicked = false;
 let dragStartLocation;
 let lastIndex;
+let isEditing = false;
+let idxEdit = null;
 
 function getMousePos(event) {
     const x = event.clientX - canvas.getBoundingClientRect().left;
     const y = event.clientY - canvas.getBoundingClientRect().top;
 
-    return { x: x, y: y };
+    return { x, y };
 }
 
 function draw(type, arrPos) {
@@ -120,6 +122,14 @@ function draw(type, arrPos) {
 }
 
 function drawShape(pos1, pos2) {
+    if (isEditing) {
+        if (idxEdit !== null) {
+            objectToDraw[idxEdit.objIdx].arrPos[idxEdit.posIdx] = pos2;
+            return render();
+        }
+        return;
+    }
+
     if (drawType === 'line') {
         draw(gl.LINES, [pos1, pos2])
     } else if (drawType === 'square') {
@@ -140,6 +150,11 @@ function dragStart(event) {
     clicked = true;
     dragStartLocation = getMousePos(event);
     lastIndex = objectToDraw.length;
+
+    isEditing = document.getElementById('edit').value === 'true';
+    if (isEditing) {
+        idxEdit = findPoint(dragStartLocation);
+    }
 }
 
 function drag(event) {
@@ -212,10 +227,10 @@ saveButton.addEventListener('click', saveCanvas);
 const loadButton = document.querySelector('#load');
 const loaderButton = document.querySelector('#loader');
 
-loadButton.addEventListener('click', (e) => {
+loadButton.addEventListener('click', () => {
     loadCanvas(loaderButton)
 });
-loaderButton.addEventListener('change', (e) => {
+loaderButton.addEventListener('change', () => {
     const file = loaderButton.files[0];
     if (file) {
         processFile(file);
@@ -227,3 +242,17 @@ canvas.addEventListener('mousemove', drag, false);
 canvas.addEventListener('mouseup', dragStop, false);
 
 render();
+
+
+// function to find nearest vertex of object
+function findPoint(point, epsilon = 7) {
+    for (const [objIdx, obj] of objectToDraw.entries()) {
+        for (const [posIdx, pos] of obj.arrPos.entries()) {
+            // console.log(Math.hypot(point.x - pos.x, point.y - pos.y));
+            if (Math.hypot(point.x - pos.x, point.y - pos.y) < epsilon) {
+                return { objIdx, posIdx }
+            }
+        }
+    }
+    return null;
+}
