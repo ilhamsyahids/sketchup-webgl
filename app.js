@@ -151,7 +151,6 @@ function dragStart(event) {
     dragStartLocation = getMousePos(event);
     lastIndex = objectToDraw.length;
 
-    isEditing = document.getElementById('edit').value === 'true';
     if (isEditing) {
         idxEdit = findPoint(dragStartLocation);
     }
@@ -221,6 +220,9 @@ const processFile = async (file) => {
 const clearButton = document.querySelector('#clear');
 clearButton.addEventListener('click', clearCanvas);
 
+const editButton = document.getElementById('edit');
+editButton.addEventListener('click', toggleEdit);
+
 const saveButton = document.querySelector('#save');
 saveButton.addEventListener('click', saveCanvas);
 
@@ -255,4 +257,13 @@ function findPoint(point, epsilon = 7) {
         }
     }
     return null;
+}
+
+function toggleEdit() {
+    isEditing = !isEditing;
+    if (isEditing) {
+        editButton.classList.add('active')
+    } else {
+        editButton.classList.remove('active')
+    }
 }

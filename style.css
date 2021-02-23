@@ -80,3 +80,7 @@ main .btnSide {
 canvas {
     cursor: crosshair;
 }
+
+.active {
+    background-color: aqua;
+}
