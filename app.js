@@ -51,10 +51,18 @@ function render() {
     objectToDraw.reverse()
 
     objectToDraw.forEach((object) => {
+        let vertices = [];
+
+        object.arrPos.forEach((pos) => {
+            vertices.push(
+                -1 + 2 * pos.x / canvas.width, // x
+                -1 + 2 * (canvas.height - pos.y) / canvas.height // y
+            );
+        });
 
         const vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(object.vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
         var index_buffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
@@ -92,17 +100,8 @@ function getMousePos(event) {
 }
 
 function draw(type, arrPos) {
-    let vertices = [];
-
-    arrPos.forEach((pos) => {
-        vertices.push(
-            -1 + 2 * pos.x / canvas.width, // x
-            -1 + 2 * (canvas.height - pos.y) / canvas.height // y
-        );
-    })
-
     let indices = [];
-    for (let vertex = 0, i = 0; vertex < vertices.length; vertex += 2, ++i) {
+    for (let i = 0; i < arrPos.length; ++i) {
         indices.push(i);
     }
 
@@ -114,7 +113,7 @@ function draw(type, arrPos) {
         parseInt("0x" + colorInput.slice(5, 7)) / 256.0);
 
     objectToDraw[lastIndex] = {
-        type, vertices, color, indices
+        type, arrPos, color, indices
     };
 
     render();
@@ -219,7 +218,7 @@ loadButton.addEventListener('click', (e) => {
 loaderButton.addEventListener('change', (e) => {
     const file = loaderButton.files[0];
     if (file) {
-      processFile(file);
+        processFile(file);
     }
 })
 
