@@ -12,23 +12,28 @@
 <body>
     <canvas width="700" height="500" id="canvas"></canvas>
     <main>
-        <section id="colors" class="colors">
-            <input type="color" name="color" id="color" class="color-picker">
+        <section class="colors">
+            <input type="color" id="color" class="color-picker">
         </section>
         <section class="shape">
-            <select name="type" id="type" class="shape-picker">
+            <select id="type" class="shape-picker">
                 <option value="line">Line</option>
                 <option value="square">Square</option>
                 <option value="polygon">Polygon</option>
             </select>
         </section>
-        <button id="edit" class="btnSide" onclick="toggle()">E</button>
+        <button id="edit" class="btnSide">E</button>
         <button id="save" class="btnSide">S</button>
         <button id="load" class="btnSide">
             L
             <input id="loader" type="file" style="display: none;" />
         </button>
         <button id="clear" class="btnSide">X</button>
+        <!-- TODO: dibikin jd pop up? -->
+        <section id="edit-window" style="visibility: hidden;">
+            <input type="number" id="edit-length">
+            <input type="color" id="edit-color" class="color-picker">
+        </section>
     </main>
     <script src="app.js"></script>
 </body>

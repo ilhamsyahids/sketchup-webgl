@@ -53,12 +53,18 @@ function render() {
     objectToDraw.forEach((object) => {
         let vertices = [];
 
-        object.arrPos.forEach((pos) => {
+        object.vertices.forEach((pos) => {
             vertices.push(
                 -1 + 2 * pos.x / canvas.width, // x
                 -1 + 2 * (canvas.height - pos.y) / canvas.height // y
             );
         });
+
+        let color = [];
+        color.push(
+            parseInt("0x" + object.color.slice(1, 3)) / 256.0,
+            parseInt("0x" + object.color.slice(3, 5)) / 256.0,
+            parseInt("0x" + object.color.slice(5, 7)) / 256.0);
 
         const vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -76,9 +82,9 @@ function render() {
         gl.enableVertexAttribArray(coordLoc);
 
         const colorLoc = gl.getUniformLocation(shaderProgram, "color");
-        gl.uniform3fv(colorLoc, object.color);
+        gl.uniform3fv(colorLoc, color);
 
-        gl.drawElements(object.type, object.indices.length, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(object.glType, object.indices.length, gl.UNSIGNED_SHORT, 0);
     });
 
     objectToDraw.reverse()
@@ -101,21 +107,14 @@ function getMousePos(event) {
     return { x, y };
 }
 
-function draw(type, arrPos) {
+function draw(glType, vertices, type) {
     let indices = [];
-    for (let i = 0; i < arrPos.length; ++i) {
+    for (let i = 0; i < vertices.length; ++i) {
         indices.push(i);
     }
 
-    const colorInput = getColor();
-    let color = [];
-    color.push(
-        parseInt("0x" + colorInput.slice(1, 3)) / 256.0,
-        parseInt("0x" + colorInput.slice(3, 5)) / 256.0,
-        parseInt("0x" + colorInput.slice(5, 7)) / 256.0);
-
     objectToDraw[lastIndex] = {
-        type, arrPos, color, indices
+        glType, vertices, color: getColor(), indices, type
     };
 
     render();
@@ -124,14 +123,17 @@ function draw(type, arrPos) {
 function drawShape(pos1, pos2) {
     if (isEditing) {
         if (idxEdit !== null) {
-            objectToDraw[idxEdit.objIdx].arrPos[idxEdit.posIdx] = pos2;
+            objectToDraw[idxEdit.objIdx].vertices[idxEdit.posIdx] = pos2;
+            if (objectToDraw[idxEdit.objIdx].type === 'square') {
+                objectToDraw[idxEdit.objIdx].type = 'polygon';
+            }
             return render();
         }
         return;
     }
 
     if (drawType === 'line') {
-        draw(gl.LINES, [pos1, pos2])
+        draw(gl.LINES, [pos1, pos2], drawType)
     } else if (drawType === 'square') {
         const length = Math.min(Math.abs(pos2.x - pos1.x), Math.abs(pos2.y - pos1.y));
         const sign = { x: Math.sign(pos2.x - pos1.x), y: Math.sign(pos2.y - pos1.y) };
@@ -141,7 +143,7 @@ function drawShape(pos1, pos2) {
             { x: pos1.x + sign.x * length, y: pos1.y + sign.y * length },
             { x: pos1.x + sign.x * length, y: pos1.y }
         ];
-        draw(gl.TRIANGLE_FAN, pos);
+        draw(gl.TRIANGLE_FAN, pos, drawType);
     }
 }
 
@@ -249,7 +251,7 @@ render();
 // function to find nearest vertex of object
 function findPoint(point, epsilon = 7) {
     for (const [objIdx, obj] of objectToDraw.entries()) {
-        for (const [posIdx, pos] of obj.arrPos.entries()) {
+        for (const [posIdx, pos] of obj.vertices.entries()) {
             // console.log(Math.hypot(point.x - pos.x, point.y - pos.y));
             if (Math.hypot(point.x - pos.x, point.y - pos.y) < epsilon) {
                 return { objIdx, posIdx }
@@ -266,4 +268,42 @@ function toggleEdit() {
     } else {
         editButton.classList.remove('active')
     }
+}
+
+// editing object when right click
+canvas.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    if (isEditing) {
+        idxEdit = findPoint(getMousePos(event));
+        if (idxEdit !== null){
+            // TODO: munculin pop up window buat edit?
+            // alert(`Edit object no ${idxEdit.objIdx + 1}`);
+            document.getElementById('edit-color').value = objectToDraw[idxEdit.objIdx].color;
+            if (objectToDraw[idxEdit.objIdx].type === 'line') {
+                const p1 = objectToDraw[idxEdit.objIdx].vertices[0],
+                    p2 = objectToDraw[idxEdit.objIdx].vertices[1];
+                // set default length value
+                document.getElementById('edit-length').value = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+            }
+        }
+    }
+});
+
+// TODO: manggil fungsi ini ketika user sudah selesai masukin editannya
+// function to handling the editing
+function makeEdit() {
+    objectToDraw[idxEdit.objIdx].color = document.getElementById('edit-color').value;
+    if (objectToDraw[idxEdit.objIdx].type === 'line') {
+        const p1 = objectToDraw[idxEdit.objIdx].vertices[0];
+        const p2 = objectToDraw[idxEdit.objIdx].vertices[1];
+
+        const lengthBefore = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+        const lengthAfter = document.getElementById('edit-length').value;
+        
+        objectToDraw[idxEdit.objIdx].vertices[1] = {
+            x: p1.x + (p2.x - p1.x) * lengthAfter / lengthBefore,
+            y: p1.y + (p2.y - p1.y) * lengthAfter / lengthBefore
+        };
+    }
+    render();
 }
