@@ -167,8 +167,7 @@ function clearCanvas() {
 
 function saveCanvas() {
     const obj = {
-        object: objectToDraw,
-        canvas: { width: canvas.width, height: canvas.height }
+        object: objectToDraw
     }
     downloadObject(obj, `${Date.now()}.json`)
 }
