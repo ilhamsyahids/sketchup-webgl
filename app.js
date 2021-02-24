@@ -9,18 +9,15 @@ gl.viewport(0, 0, canvas.width, canvas.height);
 // vertex & fragment shader source code
 const vertCode = [
     'attribute vec2 coordinate;',
-    'uniform vec3 color;',
-    'varying vec3 vColor;',
     'void main(void) {',
     '   gl_Position = vec4(coordinate, 0.0, 1.0);',
-    '   vColor = color;',
     '}'].join('\n');
 
 const fragCode = [
     'precision mediump float;',
-    'varying vec3 vColor;',
+    'uniform vec3 color;',
     'void main(void) {',
-    '   gl_FragColor = vec4(vColor, 1.0);',
+    '   gl_FragColor = vec4(color, 1.0);',
     '}'].join('\n');
 
 // vertex & fragment shader
