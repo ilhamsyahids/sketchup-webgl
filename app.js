@@ -273,6 +273,7 @@ function toggleEdit() {
 // editing object when right click
 canvas.addEventListener('contextmenu', (event) => {
     event.preventDefault();
+    clicked = false;
     idxEdit = findPoint(getMousePos(event));
     if (idxEdit !== null) {
         let isChange = false;
