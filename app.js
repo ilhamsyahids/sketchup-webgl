@@ -99,6 +99,8 @@ let dragStartLocation;
 let lastIndex;
 let isEditing = false;
 let idxEdit = null;
+let nSide;
+let posMouse = [];
 
 function getMousePos(event) {
     const x = event.clientX - canvas.getBoundingClientRect().left;
@@ -166,6 +168,19 @@ function dragStart(event) {
     clicked = true;
     dragStartLocation = getMousePos(event);
     lastIndex = objectToDraw.length;
+
+    if (drawType === 'polygon' && !isEditing) {
+        if (posMouse.length === 0) {
+            nSide = Number(document.getElementById('sides').value);
+        }
+        if (posMouse.length < nSide) {
+            posMouse.push(dragStartLocation);
+        }
+        if (posMouse.length ===  nSide) {
+            draw(gl.TRIANGLE_FAN, posMouse, drawType);
+            posMouse = [];
+        }
+    }
 
     if (isEditing) {
         idxEdit = findPoint(dragStartLocation);
@@ -371,5 +386,14 @@ function changeSquareEdge(objIdx, newEdge) {
             obj.vertices[2].x = obj.vertices[1].x - newEdge
             obj.vertices[2].y = obj.vertices[3].y + newEdge
         }
+    }
+}
+
+function onChangeSide(val) {
+    const shapeSides = document.getElementById('shape-side')
+    if (val === 'polygon') {
+        shapeSides.style.display = ''
+    } else {
+        shapeSides.style.display = ''
     }
 }

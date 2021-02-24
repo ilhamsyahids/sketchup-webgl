@@ -16,11 +16,15 @@
             <input type="color" id="color" class="color-picker">
         </section>
         <section class="shape">
-            <select id="type" class="shape-picker">
+            <select id="type" class="shape-picker" onchange="onChangeSide(this.value)">
                 <option value="line">Line</option>
                 <option value="square">Square</option>
                 <option value="polygon">Polygon</option>
             </select>
+        </section>
+        <section id="shape-side" class="shape" style="display: none;">
+            S
+            <input type="number" id="sides" class="sides" min="3" value="3">
         </section>
         <button id="edit" class="btnSide">E</button>
         <button id="save" class="btnSide">S</button>
