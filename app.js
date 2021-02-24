@@ -45,9 +45,6 @@ function render() {
     gl.clearColor(0.5, 0.5, 0.5, 0.9);
     gl.enable(gl.DEPTH_TEST);
 
-    // Glitch when drag object
-    // gl.clear(gl.COLOR_BUFFER_BIT);
-
     objectToDraw.reverse()
 
     objectToDraw.forEach((object) => {
@@ -90,9 +87,7 @@ function render() {
     objectToDraw.reverse()
 }
 
-
 // live drawing
-
 let drawType;
 let dragging = false, clicked = false;
 let dragStartLocation;
@@ -160,6 +155,17 @@ function drawShape(pos1, pos2) {
             }
         }
         draw(gl.TRIANGLE_FAN, pos, drawType, { orientation });
+    } else if (drawType === 'polygon-angle') {
+        const polygonSides = getSides();
+        const radius = Math.hypot(pos1.x - pos2.x, pos1.y - pos2.y)
+        const pos = []
+        for (let i = 0; i < polygonSides; i++) {
+            pos.push({
+                x: pos1.x + radius * Math.cos( 2 * Math.PI / polygonSides * i + Math.PI / 10),
+                y: pos1.y - radius * Math.sin( 2 * Math.PI / polygonSides * i + Math.PI / 10)
+            })
+        }
+        draw(gl.TRIANGLE_FAN, pos, 'polygon');
     }
 }
 
@@ -171,7 +177,7 @@ function dragStart(event) {
 
     if (drawType === 'polygon' && !isEditing) {
         if (posMouse.length === 0) {
-            nSide = Number(document.getElementById('sides').value);
+            nSide = Number(getSides());
         }
         if (posMouse.length < nSide) {
             posMouse.push(dragStartLocation);
@@ -278,7 +284,6 @@ render();
 function findPoint(point, epsilon = 7) {
     for (const [objIdx, obj] of objectToDraw.entries()) {
         for (const [posIdx, pos] of obj.vertices.entries()) {
-            // console.log(Math.hypot(point.x - pos.x, point.y - pos.y));
             if (Math.hypot(point.x - pos.x, point.y - pos.y) < epsilon) {
                 return { objIdx, posIdx }
             }
@@ -391,9 +396,13 @@ function changeSquareEdge(objIdx, newEdge) {
 
 function onChangeSide(val) {
     const shapeSides = document.getElementById('shape-side')
-    if (val === 'polygon') {
+    if (val === 'polygon' || val === 'polygon-angle') {
         shapeSides.style.display = ''
     } else {
-        shapeSides.style.display = ''
+        shapeSides.style.display = 'none'
     }
+}
+
+function getSides() {
+    return document.getElementById('sides').value;
 }
