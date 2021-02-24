@@ -221,9 +221,6 @@ function loadCanvas(loader) {
 }
 
 const processFile = async (file) => {
-    const fr = new FileReader();
-
-    fr.readAsArrayBuffer(file);
     const text = await file.text();
     const loaded = JSON.parse(text);
 
