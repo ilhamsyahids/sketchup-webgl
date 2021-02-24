@@ -289,6 +289,17 @@ canvas.addEventListener('contextmenu', (event) => {
             }
         }
 
+        if (objectToDraw[idxEdit.objIdx].type === 'square') {
+            const p1 = objectToDraw[idxEdit.objIdx].vertices[0]
+            const p2 = objectToDraw[idxEdit.objIdx].vertices[1];
+            const val = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            const newEdge = prompt(`Insert new edge for object ${idxEdit.objIdx + 1}`, val);
+            if (!(newEdge === "" || newEdge === null || isNaN(Number(newEdge)))) {
+                changeSquareEdge(idxEdit.objIdx, Number(newEdge));
+                isChange = true;
+            }
+        }
+
         const newColor = prompt(`Insert new color for object ${idxEdit.objIdx + 1}`, objectToDraw[idxEdit.objIdx].color);
         if (!(newColor === "" || newColor === null) && /^#[0-9A-Fa-f]{6}$/.test(newColor)) {
             objectToDraw[idxEdit.objIdx].color = newColor;
@@ -310,5 +321,17 @@ function changeLineLength(objIdx, newLength) {
             x: p1.x + (p2.x - p1.x) * newLength / lengthBefore,
             y: p1.y + (p2.y - p1.y) * newLength / lengthBefore
         };
+    }
+}
+
+function changeSquareEdge(objIdx, newEdge) {
+    if (objectToDraw[objIdx].type === 'square') {
+        // top right
+        objectToDraw[objIdx].vertices[3].x = objectToDraw[objIdx].vertices[0].x + newEdge
+        // bottom left
+        objectToDraw[objIdx].vertices[1].y = objectToDraw[objIdx].vertices[0].y + newEdge
+        // bottom right
+        objectToDraw[objIdx].vertices[2].x = objectToDraw[objIdx].vertices[1].x + newEdge
+        objectToDraw[objIdx].vertices[2].y = objectToDraw[objIdx].vertices[3].y + newEdge
     }
 }
