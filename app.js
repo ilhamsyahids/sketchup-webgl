@@ -273,37 +273,41 @@ function toggleEdit() {
 // editing object when right click
 canvas.addEventListener('contextmenu', (event) => {
     event.preventDefault();
-    if (isEditing) {
-        idxEdit = findPoint(getMousePos(event));
-        if (idxEdit !== null){
-            // TODO: munculin pop up window buat edit?
-            // alert(`Edit object no ${idxEdit.objIdx + 1}`);
-            document.getElementById('edit-color').value = objectToDraw[idxEdit.objIdx].color;
-            if (objectToDraw[idxEdit.objIdx].type === 'line') {
-                const p1 = objectToDraw[idxEdit.objIdx].vertices[0],
-                    p2 = objectToDraw[idxEdit.objIdx].vertices[1];
-                // set default length value
-                document.getElementById('edit-length').value = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+    idxEdit = findPoint(getMousePos(event));
+    if (idxEdit !== null) {
+        let isChange = false;
+        if (objectToDraw[idxEdit.objIdx].type === 'line') {
+            const p1 = objectToDraw[idxEdit.objIdx].vertices[0],
+                p2 = objectToDraw[idxEdit.objIdx].vertices[1];
+            // set default length value
+            const val = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            const newLength = prompt(`Insert new length for object ${idxEdit.objIdx + 1}`, val);
+            if (!(newLength === "" || newLength === null || isNaN(Number(newLength)))) {
+                changeLineLength(idxEdit.objIdx, Number(newLength));
+                isChange = true;
             }
         }
+
+        const newColor = prompt(`Insert new color for object ${idxEdit.objIdx + 1}`, objectToDraw[idxEdit.objIdx].color);
+        if (!(newColor === "" || newColor === null) && /^#[0-9A-Fa-f]{6}$/.test(newColor)) {
+            objectToDraw[idxEdit.objIdx].color = newColor;
+            isChange = true;
+        }
+        if (isChange) render();
     }
 });
 
-// TODO: manggil fungsi ini ketika user sudah selesai masukin editannya
 // function to handling the editing
-function makeEdit() {
-    objectToDraw[idxEdit.objIdx].color = document.getElementById('edit-color').value;
-    if (objectToDraw[idxEdit.objIdx].type === 'line') {
-        const p1 = objectToDraw[idxEdit.objIdx].vertices[0];
-        const p2 = objectToDraw[idxEdit.objIdx].vertices[1];
+function changeLineLength(objIdx, newLength) {
+    if (objectToDraw[objIdx].type === 'line') {
+        const p1 = objectToDraw[objIdx].vertices[0];
+        const p2 = objectToDraw[objIdx].vertices[1];
 
-        const lengthBefore = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-        const lengthAfter = document.getElementById('edit-length').value;
-        
-        objectToDraw[idxEdit.objIdx].vertices[1] = {
-            x: p1.x + (p2.x - p1.x) * lengthAfter / lengthBefore,
-            y: p1.y + (p2.y - p1.y) * lengthAfter / lengthBefore
+        const lengthBefore = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+
+        objectToDraw[objIdx].vertices[1] = {
+            x: p1.x + (p2.x - p1.x) * newLength / lengthBefore,
+            y: p1.y + (p2.y - p1.y) * newLength / lengthBefore
         };
     }
-    render();
 }
