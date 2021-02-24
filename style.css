@@ -28,6 +28,14 @@ main .colors .color-picker {
     border: 0;
 }
 
+main .colors .si {
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
+    padding: 0;
+    border: 0;
+}
+
 main .shape {
     position: relative;
     background-color: #F3F3F3
@@ -61,25 +69,6 @@ main .shape .shape-picker:focus {
 }
 
 main .shape:hover .shape-picker {
-    display: block
-}
-
-.sides {
-    display: none;
-    position: absolute;
-    width: auto;
-    height: 25px;
-    left: 30px;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%)
-}
-
-.sides:focus {
-    display: block
-}
-
-main .shape:hover .sides {
     display: block
 }
 
