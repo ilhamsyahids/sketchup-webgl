@@ -107,15 +107,15 @@ function getMousePos(event) {
     return { x, y };
 }
 
-function draw(glType, vertices, type) {
+function draw(glType, vertices, type, otherProperty = {}) {
     let indices = [];
     for (let i = 0; i < vertices.length; ++i) {
         indices.push(i);
     }
 
-    objectToDraw[lastIndex] = {
+    objectToDraw[lastIndex] = Object.assign({
         glType, vertices, color: getColor(), indices, type
-    };
+    }, otherProperty);
 
     render();
 }
@@ -135,6 +135,7 @@ function drawShape(pos1, pos2) {
     if (drawType === 'line') {
         draw(gl.LINES, [pos1, pos2], drawType)
     } else if (drawType === 'square') {
+        let orientation; // kuadran
         const length = Math.min(Math.abs(pos2.x - pos1.x), Math.abs(pos2.y - pos1.y));
         const sign = { x: Math.sign(pos2.x - pos1.x), y: Math.sign(pos2.y - pos1.y) };
         const pos = [
@@ -143,7 +144,20 @@ function drawShape(pos1, pos2) {
             { x: pos1.x + sign.x * length, y: pos1.y + sign.y * length },
             { x: pos1.x + sign.x * length, y: pos1.y }
         ];
-        draw(gl.TRIANGLE_FAN, pos, drawType);
+        if (pos2.x - pos1.x > 0) {
+            if (pos2.y - pos1.y > 0) {
+                orientation = 4
+            } else {
+                orientation = 1
+            }
+        } else {
+            if (pos2.y - pos1.y > 0) {
+                orientation = 3
+            } else {
+                orientation = 2
+            }
+        }
+        draw(gl.TRIANGLE_FAN, pos, drawType, { orientation });
     }
 }
 
