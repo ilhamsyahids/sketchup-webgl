@@ -339,13 +339,40 @@ function changeLineLength(objIdx, newLength) {
 }
 
 function changeSquareEdge(objIdx, newEdge) {
-    if (objectToDraw[objIdx].type === 'square') {
-        // top right
-        objectToDraw[objIdx].vertices[3].x = objectToDraw[objIdx].vertices[0].x + newEdge
-        // bottom left
-        objectToDraw[objIdx].vertices[1].y = objectToDraw[objIdx].vertices[0].y + newEdge
-        // bottom right
-        objectToDraw[objIdx].vertices[2].x = objectToDraw[objIdx].vertices[1].x + newEdge
-        objectToDraw[objIdx].vertices[2].y = objectToDraw[objIdx].vertices[3].y + newEdge
+    const obj = objectToDraw[objIdx];
+    if (obj.type === 'square') {
+        if (obj.orientation === 4) {
+            // top right
+            obj.vertices[3].x = obj.vertices[0].x + newEdge
+            // bottom left
+            obj.vertices[1].y = obj.vertices[0].y + newEdge
+            // bottom right
+            obj.vertices[2].x = obj.vertices[1].x + newEdge
+            obj.vertices[2].y = obj.vertices[3].y + newEdge
+        } else if (obj.orientation === 1) {
+            // bottom right
+            obj.vertices[3].x = obj.vertices[0].x + newEdge
+            // top left
+            obj.vertices[1].y = obj.vertices[0].y - newEdge
+            // top right
+            obj.vertices[2].x = obj.vertices[1].x + newEdge
+            obj.vertices[2].y = obj.vertices[3].y - newEdge
+        } else if (obj.orientation === 2) {
+            // bottom left
+            obj.vertices[3].x = obj.vertices[0].x - newEdge
+            // top right
+            obj.vertices[1].y = obj.vertices[0].y - newEdge
+            // top left
+            obj.vertices[2].x = obj.vertices[1].x - newEdge
+            obj.vertices[2].y = obj.vertices[3].y - newEdge
+        } else {
+            // top left
+            obj.vertices[3].x = obj.vertices[0].x - newEdge
+            // bottom right
+            obj.vertices[1].y = obj.vertices[0].y + newEdge
+            // bottom left
+            obj.vertices[2].x = obj.vertices[1].x - newEdge
+            obj.vertices[2].y = obj.vertices[3].y + newEdge
+        }
     }
 }
