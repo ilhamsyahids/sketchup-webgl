@@ -160,6 +160,17 @@ function drawShape(pos1, pos2) {
             }
         }
         draw(gl.TRIANGLE_FAN, pos, drawType, { orientation });
+    } else if (drawType === 'polygon-angle') {
+        const polygonSides = getSides();
+        const radius = Math.sqrt(Math.pow((pos1.x - pos2.x), 2) + Math.pow((pos1.y - pos2.y), 2), 2)
+        const pos = []
+        for (let i = 0; i < polygonSides; i++) {
+            pos.push({
+                x: pos1.x + radius * Math.cos( 2 * Math.PI / polygonSides * i),
+                y: pos1.y - radius * Math.sin( 2 * Math.PI / polygonSides * i)
+            })
+        }
+        draw(gl.TRIANGLE_FAN, pos, 'polygon');
     }
 }
 
@@ -171,7 +182,7 @@ function dragStart(event) {
 
     if (drawType === 'polygon' && !isEditing) {
         if (posMouse.length === 0) {
-            nSide = Number(document.getElementById('sides').value);
+            nSide = Number(getSides());
         }
         if (posMouse.length < nSide) {
             posMouse.push(dragStartLocation);
@@ -391,9 +402,13 @@ function changeSquareEdge(objIdx, newEdge) {
 
 function onChangeSide(val) {
     const shapeSides = document.getElementById('shape-side')
-    if (val === 'polygon') {
+    if (val === 'polygon' || val === 'polygon-angle') {
         shapeSides.style.display = ''
     } else {
-        shapeSides.style.display = ''
+        shapeSides.style.display = 'none'
     }
+}
+
+function getSides() {
+    return document.getElementById('sides').value;
 }
